@@ -54,7 +54,6 @@ gql: "query productById($productId: Int!) {
 }"
 ---
 {{inject 'productId' product.id}}
-{{inject 'productVariantsWithOptions' gql.data.site.product.variants.edges}}
 
 {{#partial "head"}}
     {{#if (length product.options) "===" 1}}
