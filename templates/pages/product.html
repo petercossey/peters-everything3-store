@@ -8,8 +8,69 @@ product:
         limit: {{theme_settings.productpage_related_products_count}}
     similar_by_views:
         limit: {{theme_settings.productpage_similar_by_views_count}}
+gql: "query productById($productId: Int!) {
+    site {
+        product(entityId: $productId) {
+            entityId
+            sku
+            name
+            productOptions {
+                edges {
+                    node {
+                        entityId
+                        isRequired
+                        displayName
+                    }
+                }
+            }
+            variants {
+                edges {
+                    node {
+                        entityId
+                        sku
+                        isPurchasable
+                        options {
+                            edges {
+                                node {
+                                    entityId
+                                    displayName
+                                    isRequired
+                                    values {
+                                        edges {
+                                            node {
+                                                entityId
+                                                label
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}"
 ---
 {{inject 'productId' product.id}}
+{{inject 'productVariantsWithOptions' gql.data.site.product.variants.edges}}
+
+{{#partial "head"}}
+    {{#if (length product.options) "===" 1}}
+        <style type="text/css">
+            {{#each gql.data.site.product.variants.edges}}
+                {{#unless node.isPurchasable}}
+                    {{#with (getObject "options.edges.0.node.values.edges.0.node" node)}}
+                        label.form-label[data-product-attribute-value="{{node.entityId}}"] {
+                            display: none !important;
+                        }
+                    {{/with}}
+                {{/unless}}
+            {{/each}}
+        </style>
+    {{/if}}
+{{/partial}}
 
 {{#partial "page"}}
 
