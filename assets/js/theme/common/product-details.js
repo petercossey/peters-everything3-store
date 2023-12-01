@@ -268,6 +268,9 @@ export default class ProductDetails extends ProductDetailsBase {
             this.updateProductDetailsData();
             bannerUtils.dispatchProductBannerEvent(productAttributesData);
 
+            console.log('Response from utils.api.productAttributes.optionChange: ', response.data);
+            this.updateInventoryShippingMessage(productAttributesData);
+
             if (!this.checkIsQuickViewChild($form)) {
                 const $context = $form.parents('.productView').find('.productView-info');
                 modalFactory('[data-reveal]', { $context });
@@ -582,5 +585,43 @@ export default class ProductDetails extends ProductDetailsBase {
             bubbles: true,
             detail: { productDetails },
         }));
+    }
+
+    updateInventoryShippingMessage(data) {
+        // update the DOM to disply a relevant inventory message.
+        //console.log('updateInventoryShippingMessage method in product-details.js: update relevant DOM element with shipping message base on inventory status');
+        //console.log('jsContext available in updateInventoryShippingMessage:', this.context);
+        //console.log('updateInventoryShippingMessage data from variant options change event: ', data);
+
+        const $preface = $('[data-inventory-shipping-preface]');
+        const $message = $('[data-inventory-shipping-message]');
+
+        const productVariantInventory = this.findProductBySku(data.sku, this.context.productVariantsInventory);
+
+        if (data.purchasable) {
+            $preface.text(`Item is purchasable`);
+        } else {
+            $preface.text(`Item is NOT purchasable`);
+        }
+
+        if (productVariantInventory) {
+            $message.text(`Inventory data found`);
+            console.log('Variant inventory data:', productVariantInventory);
+        } else {
+            $message.text(`No inventory data`);
+        }
+    }
+
+    // return a product with matching sku from a product list.
+    findProductBySku(sku, productList) {
+        for (let i = 0; i < productList.length; i++) {
+            // Check if the current product's node.sku matches the sku parameter
+            if (productList[i].node.sku === sku) {
+                // Return the matching product object
+                return productList[i].node;
+            }
+        }
+        // Return false if no product matches the sku
+        return false;
     }
 }

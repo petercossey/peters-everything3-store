@@ -8,8 +8,35 @@ product:
         limit: {{theme_settings.productpage_related_products_count}}
     similar_by_views:
         limit: {{theme_settings.productpage_similar_by_views_count}}
+gql: "query productVariantsInventory($productId: Int!) {
+    site {
+        product(entityId: $productId) {
+            variants {
+                edges {
+                    node {
+                        sku
+                        entityId
+                        isPurchasable
+                        inventory {
+                            byLocation {
+                                edges {
+                                    node {
+                                        locationEntityCode
+                                        availableToSell
+                                        isInStock
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}"
 ---
 {{inject 'productId' product.id}}
+{{inject 'productVariantsInventory' gql.data.site.product.variants.edges}}
 
 {{#partial "page"}}
 
