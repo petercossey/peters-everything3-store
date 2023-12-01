@@ -612,6 +612,7 @@ export default class ProductDetails extends ProductDetailsBase {
         }
     }
 
+    // return a product with matching sku from a product list.
     findProductBySku(sku, productList) {
         for (let i = 0; i < productList.length; i++) {
             // Check if the current product's node.sku matches the sku parameter
