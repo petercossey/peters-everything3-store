@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Draft
+
+## 6.13.0 (02-12-2024)
+- Fix HTML markup for product listing and below content region [#2426](https://github.com/bigcommerce/cornerstone/pull/2426)
+- With Product Filtering enabled widgets on category page disappear after navigating using pagination [#2425](https://github.com/bigcommerce/cornerstone/pull/2425)
+- Update layout with correct usage of main tag [#2421](https://github.com/bigcommerce/cornerstone/pull/2421)
+- Anchor links on category pages are not working when product filtering is enabled [#2415](https://github.com/bigcommerce/cornerstone/pull/2415)
 - Dispatch an event on productOptionsChanged [#2400](https://github.com/bigcommerce/cornerstone/pull/2400)
 - Check lang helpers usage and existence of key in translation file [#2403](https://github.com/bigcommerce/cornerstone/pull/2403)
 - Display fees on cart page [#2376](https://github.com/bigcommerce/cornerstone/pull/2376)
@@ -20,9 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change case of Page builder menu item text [#2407](https://github.com/bigcommerce/cornerstone/pull/2407)
 - Corrected typo with the word default previously deafault in config.json [#2410](https://github.com/bigcommerce/cornerstone/pull/2410)
 - Adding autocomplete to common input fields [2397](https://github.com/bigcommerce/cornerstone/pull/2397)
+- ADA Compliance - Expandable items should be read by screen reader [2422](https://github.com/bigcommerce/cornerstone/pull/2422)
 - Pre-Orded text in Polish looks cropped in the button on Product page [2414](https://github.com/bigcommerce/cornerstone/pull/2414)
 - Use triple sash on customer's company name to prevent escaping ampersands [#2399](https://github.com/bigcommerce/cornerstone/pull/2399)
 - Adding aria attributes to cart page coupon code and gift cert buttons [#2391](https://github.com/bigcommerce/cornerstone/pull/2391)
+- ADA Compliance - Errors are not identified to screen reader users within the Refine By accordions [#2424](https://github.com/bigcommerce/cornerstone/pull/2424)
 
 ## 6.12.0 (07-06-2023)
 - sync package lock file [#2373](https://github.com/bigcommerce/cornerstone/pull/2373)
