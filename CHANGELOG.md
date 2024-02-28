@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Draft
+- Remove shop_by_price: true from category.html [#2431](https://github.com/bigcommerce/cornerstone/pull/2431)
+- Added SEPA and ECP stored bank accounts typesto the Payment methods page [#2434](https://github.com/bigcommerce/cornerstone/pull/2434)
 
 ## 6.13.0 (02-12-2024)
 - Fix HTML markup for product listing and below content region [#2426](https://github.com/bigcommerce/cornerstone/pull/2426)
