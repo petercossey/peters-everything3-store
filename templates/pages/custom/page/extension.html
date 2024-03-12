@@ -3,12 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://checkout-sdk.bigcommerce.com/v1/loader.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 </head>
 
 <body>
+  <pre>
+    {{json cart}}
+  </pre>
   <div x-data="mapApp()" x-init="initMap">
     <div class="button-group" style="margin-bottom: 10px">
       <button @click="setMode('pickup')">In-store Pickup</button>
@@ -21,6 +27,20 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
+    // BigCommerce Extension Library loading and initialization
+    checkoutKitLoader.load('extension')
+      .then(async function (module) {
+        const params = new URL(document.location).searchParams;
+        const extensionId = params.get('extensionId');
+        const parentOrigin = params.get('parentOrigin');
+
+        extensionService = await module.initializeExtensionService({
+          extensionId,
+          parentOrigin,
+        });
+
+      });
+
     function mapApp() {
       return {
         map: null,
@@ -113,12 +133,9 @@
           // Implement logic based on the selected mode.
           if (extensionService) {
             extensionService.post({
-              type: 'EXTENSION:SET_IFRAME_STYLE',
+              type: 'EXTENSION:SHOW_LOADING_INDICATOR',
               payload: {
-                style: {
-                  border: 'solid 2px green',
-                  height: '264px'
-                }
+                show: true
               }
             });
           }
@@ -127,29 +144,19 @@
         pickupFromStore(address) {
           console.log('Pickup from:', address);
           // Implement your logic for picking up from the selected store.
+          if (extensionService) {
+            extensionService.post({
+              type: 'EXTENSION:SET_IFRAME_STYLE',
+              payload: {
+                style: {
+                  border: "1px solid pink"
+                }
+              }
+            });
+          }
         }
       };
     }
-
-    // BigCommerce Extension Library loading and initialization
-    const script = document.createElement('script');
-    script.onload = function () {
-      checkoutKitLoader.load('extension')
-        .then(async function (module) {
-          const params = new URL(document.location).searchParams;
-          const extensionId = params.get('extensionId');
-          const parentOrigin = params.get('parentOrigin');
-
-          extensionService = await module.initializeExtensionService({
-            extensionId,
-            parentOrigin,
-          });
-
-        });
-    };
-
-    script.src = 'https://checkout-sdk.bigcommerce.com/v1/loader.js';
-    document.head.appendChild(script);
   </script>
 </body>
 
