@@ -1,0 +1,163 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://checkout-sdk.bigcommerce.com/v1/loader.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+</head>
+
+<body>
+  <pre>
+    {{json cart}}
+  </pre>
+  <div x-data="mapApp()" x-init="initMap">
+    <div class="button-group" style="margin-bottom: 10px">
+      <button @click="setMode('pickup')">In-store Pickup</button>
+      <button @click="setMode('delivery')">Delivery</button>
+    </div>
+    <div id="map" style="height: 400px"></div>
+  </div>
+
+  <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // BigCommerce Extension Library loading and initialization
+    checkoutKitLoader.load('extension')
+      .then(async function (module) {
+        const params = new URL(document.location).searchParams;
+        const extensionId = params.get('extensionId');
+        const parentOrigin = params.get('parentOrigin');
+
+        extensionService = await module.initializeExtensionService({
+          extensionId,
+          parentOrigin,
+        });
+
+      });
+
+    function mapApp() {
+      return {
+        map: null,
+        markers: [],
+        initMap() {
+          this.map = L.map("map", {
+            zoomControl: false
+          }).setView([-24.52, 111.85], 13);
+
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap contributors"
+          }).addTo(this.map);
+
+          this.loadLocations();
+        },
+
+        async loadLocations() {
+          const query = `query getLocations {
+              inventory {
+                locations {
+                  edges {
+                    node {
+                      code
+                      label
+                      address {
+                        latitude
+                        longitude
+                        address1
+                        address2
+                        city
+                        postalCode
+                        phone
+                        stateOrProvince
+                      }
+                    }
+                  }
+                }
+              }
+            }`;
+
+          try {
+            const response = await fetch("/graphql", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer {{ settings.storefront_api.token }}",
+              },
+              body: JSON.stringify({ query }),
+            });
+
+            const responseBody = await response.json();
+            this.addMarkers(responseBody.data.inventory.locations.edges);
+
+            // Store the locations data in the window context
+            window.storeLocations = responseBody.data.inventory.locations.edges.map(edge => edge.node);
+          } catch (error) {
+            console.error("Error fetching locations:", error);
+          }
+        },
+
+        addMarkers(locations) {
+          let bounds = new L.LatLngBounds();
+
+          locations.forEach(({ node }) => {
+            const code = node.code;
+            const label = node.label;
+            const { latitude, longitude, address1, city, postalCode } = node.address;
+            const markerText = `
+                    <p>${label}<br>${address1}, ${city}, ${postalCode}</p>
+                    <button @click="pickupFromStore('${code}')">Pickup from this store</button>
+                `;
+            let marker = L.marker([latitude, longitude]).bindPopup(
+              markerText
+            );
+
+            marker.addTo(this.map);
+            this.markers.push(marker);
+            bounds.extend(marker.getLatLng());
+          });
+
+          if (this.markers.length) {
+            this.map.fitBounds(bounds);
+          }
+        },
+
+        setMode(mode) {
+          console.log('Mode selected:', mode);
+          // Implement logic based on the selected mode.
+          if (extensionService) {
+            extensionService.post({
+              type: 'EXTENSION:SHOW_LOADING_INDICATOR',
+              payload: {
+                show: true
+              }
+            });
+          }
+        },
+
+        pickupFromStore(address) {
+          console.log('Pickup from:', address);
+          // Implement your logic for picking up from the selected store.
+          if (extensionService) {
+            extensionService.post({
+              type: 'EXTENSION:SET_IFRAME_STYLE',
+              payload: {
+                style: {
+                  border: "1px solid pink"
+                }
+              }
+            });
+          }
+        }
+      };
+    }
+  </script>
+</body>
+
+</html>
